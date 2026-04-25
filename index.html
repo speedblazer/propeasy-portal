@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maintenance Request — PropEasy</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #EEF2F7;
+      color: #0F172A;
+      min-height: 100vh;
+    }
+
+    /* ── Top navbar ──────────────────────────────────────────────────────────── */
+    .navbar {
+      background: linear-gradient(135deg, #1A3A5C 0%, #0F2640 100%);
+      padding: 0 20px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+    .navbar-logo-wrap {
+      width: 42px;
+      height: 42px;
+      background: #1A3A5C;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+    .navbar-logo-wrap img {
+      width: 42px;
+      height: 42px;
+      display: block;
+      border-radius: 12px;
+    }
+    .navbar-text-wrap { flex: 1; }
+    .navbar-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+    }
+    .navbar-subtitle {
+      font-size: 11.5px;
+      color: #93C5FD;
+      margin-top: 1px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+    }
+    .navbar-badge {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      white-space: nowrap;
+    }
+
+    /* ── Page body ───────────────────────────────────────────────────────────── */
+    .page {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    /* ── Property pill ───────────────────────────────────────────────────────── */
+    .property-pill {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1.5px solid #BFDBFE;
+      border-radius: 24px;
+      padding: 7px 14px 7px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1D4ED8;
+      margin-bottom: 18px;
+      width: fit-content;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .property-pill.visible { display: inline-flex; }
+    .property-pill-icon {
+      width: 22px;
+      height: 22px;
+      background: #DBEAFE;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .property-pill-icon svg {
+      width: 13px;
+      height: 13px;
+      fill: #1D4ED8;
+    }
+
+    /* ── Landlord message banner ─────────────────────────────────────────────── */
+    .message-banner {
+      display: none;
+      background: #FFFFFF;
+      border: 1.5px solid #A5F3FC;
+      border-left: 4px solid #0891B2;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 18px;
+      gap: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    }
+    .message-banner.visible { display: flex; align-items: flex-start; }
+    .message-banner-icon {
+      width: 38px;
+      height: 38px;
+      background: #ECFEFF;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+    .message-banner-body { flex: 1; }
+    .message-banner-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #0891B2;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    .message-banner-text {
+      font-size: 14px;
+      color: #0F172A;
+      line-height: 1.6;
+    }
+
+    /* ── Section heading ─────────────────────────────────────────────────────── */
+    .section-heading {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #94A3B8;
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+
+    /* ── Card ────────────────────────────────────────────────────────────────── */
+    .card {
+      background: #FFFFFF;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A3A5C;
+      letter-spacing: -0.1px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-title-icon.blue   { background: #EFF6FF; }
+    .card-title-icon.orange { background: #FFF7ED; }
+    .card-title-icon.green  { background: #F0FDF4; }
+    .card-title-icon svg { width: 15px; height: 15px; }
+
+    /* ── Form fields ─────────────────────────────────────────────────────────── */
+    .field {
+      margin-bottom: 18px;
+    }
+    .field:last-child { margin-bottom: 0; }
+    .field-row {
+      display: flex;
+      gap: 12px;
+    }
+    .field-row .field { flex: 1; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748B;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    label .optional {
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #94A3B8;
+      font-size: 11px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 11px;
+      font-size: 15px;
+      color: #0F172A;
+      background: #F8FAFC;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      -webkit-appearance: none;
+    }
+    input[type="text"]::placeholder,
+    input[type="email"]::placeholder,
+    textarea::placeholder { color: #94A3B8; }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    textarea:focus {
+      border-color: #1A3A5C;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.6;
+    }
+
+    /* ── Priority selector ───────────────────────────────────────────────────── */
+    .priority-group {
+      display: flex;
+      gap: 10px;
+    }
+    .priority-chip {
+      flex: 1;
+      padding: 14px 8px 12px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 14px;
+      background: #F8FAFC;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #64748B;
+      transition: all 0.15s;
+      user-select: none;
+      line-height: 1.3;
+    }
+    .priority-chip .chip-icon {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+    .priority-chip:active { transform: scale(0.97); }
+    .priority-chip.selected[data-value="Not Urgent"] {
+      border-color: #16A34A;
+      background: #F0FDF4;
+      color: #15803D;
+      box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+    }
+    .priority-chip.selected[data-value="Needs Attention"] {
+      border-color: #D97706;
+      background: #FFFBEB;
+      color: #B45309;
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.1);
+    }
+    .priority-chip.selected[data-value="Emergency"] {
+      border-color: #DC2626;
+      background: #FEF2F2;
+      color: #B91C1C;
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+    }
+
+    /* ── Photo upload ────────────────────────────────────────────────────────── */
+    .photo-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 22px;
+      border: 1.5px dashed #CBD5E1;
+      border-radius: 13px;
+      background: #F8FAFC;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #64748B;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .photo-upload-label:hover { border-color: #1A3A5C; background: #EFF6FF; color: #1A3A5C; }
+    .photo-upload-label svg { width: 20px; height: 20px; flex-shrink: 0; }
+    #photo-input { display: none; }
+    #photo-preview {
+      display: none;
+      width: 100%;
+      max-height: 240px;
+      object-fit: cover;
+      border-radius: 13px;
+      margin-top: 12px;
+      border: 1.5px solid #E2E8F0;
+    }
+    .photo-hint {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #94A3B8;
+      text-align: center;
+    }
+
+    /* ── Error banner ────────────────────────────────────────────────────────── */
+    .error-banner {
+      display: none;
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-left: 3px solid #DC2626;
+      border-radius: 11px;
+      padding: 12px 14px;
+      color: #DC2626;
+      font-size: 14px;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .error-banner.visible { display: block; }
+
+    /* ── Submit button ───────────────────────────────────────────────────────── */
+    .submit-btn {
+      width: 100%;
+      padding: 17px;
+      background: linear-gradient(135deg, #1A3A5C 0%, #0F2640 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 15px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(26,58,92,0.35);
+      letter-spacing: -0.1px;
+    }
+    .submit-btn:hover:not(:disabled) {
+      opacity: 0.93;
+      box-shadow: 0 6px 20px rgba(26,58,92,0.4);
+    }
+    .submit-btn:active:not(:disabled) { transform: scale(0.99); }
+    .submit-btn:disabled {
+      background: #94A3B8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .submit-btn svg { width: 18px; height: 18px; fill: #FFFFFF; flex-shrink: 0; }
+
+    /* ── Success screen ──────────────────────────────────────────────────────── */
+    #success-screen {
+      display: none;
+      text-align: center;
+      padding: 56px 24px;
+    }
+    #success-screen.visible { display: block; }
+    .success-icon-wrap {
+      width: 88px;
+      height: 88px;
+      background: #F0FDF4;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 22px;
+      box-shadow: 0 0 0 12px rgba(22,163,74,0.08);
+    }
+    .success-icon-wrap svg { width: 44px; height: 44px; }
+    .success-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 10px;
+      letter-spacing: -0.4px;
+    }
+    .success-body {
+      font-size: 15px;
+      color: #64748B;
+      line-height: 1.7;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .success-divider {
+      width: 48px;
+      height: 3px;
+      background: #16A34A;
+      border-radius: 2px;
+      margin: 18px auto;
+    }
+
+    /* ── Invalid link ────────────────────────────────────────────────────────── */
+    .invalid-wrap {
+      text-align: center;
+      padding: 56px 24px;
+    }
+    .invalid-icon-wrap {
+      width: 80px;
+      height: 80px;
+      background: #FEF3C7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 0 12px rgba(217,119,6,0.08);
+    }
+    .invalid-icon-wrap svg { width: 40px; height: 40px; }
+    .invalid-title { font-size: 22px; font-weight: 800; color: #0F172A; margin-bottom: 8px; letter-spacing: -0.3px; }
+    .invalid-body  { font-size: 15px; color: #64748B; line-height: 1.7; max-width: 300px; margin: 0 auto; }
+
+    #form-wrapper.hidden { display: none; }
+
+    /* ── Footer ──────────────────────────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+    .footer strong { color: #64748B; }
+
+    /* ── Responsive ──────────────────────────────────────────────────────────── */
+    @media (max-width: 400px) {
+      .field-row { flex-direction: column; }
+      .priority-chip { font-size: 11.5px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+  <div class="navbar-logo-wrap">
+    <img src="./icon.png" alt="PropEasy" />
+  </div>
+  <div class="navbar-text-wrap">
+    <div class="navbar-title">PropEasy</div>
+    <div class="navbar-subtitle">Maintenance Request</div>
+  </div>
+  <div class="navbar-badge">Secure Form</div>
+</div>
+
+<!-- Page body -->
+<div class="page">
+
+  <!-- Property pill (shown once token resolves) -->
+  <div class="property-pill" id="property-chip">
+    <div class="property-pill-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+    </div>
+    <span id="property-name-chip">Loading…</span>
+  </div>
+
+  <!-- Landlord's response message banner -->
+  <div class="message-banner" id="message-banner">
+    <div class="message-banner-icon">💬</div>
+    <div class="message-banner-body">
+      <div class="message-banner-label">Message from your landlord</div>
+      <div class="message-banner-text" id="message-banner-text"></div>
+    </div>
+  </div>
+
+  <!-- Success screen -->
+  <div id="success-screen">
+    <div class="success-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 12.5l3.5 3.5 6.5-7" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="success-title">Your request has been submitted!</div>
+    <div class="success-divider"></div>
+    <div class="success-body">
+      Your landlord has been notified and will be in touch soon.<br/>
+      You can bookmark this page to check for updates.
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div id="form-wrapper">
+
+    <!-- Top error banner -->
+    <div id="error-banner" class="error-banner"></div>
+
+    <form id="maintenance-form">
+
+      <!-- ── Your Info ──────────────────────────────────────────────────────── -->
+      <p class="section-heading">Your Information</p>
+      <div class="card">
+        <div class="field-row">
+          <div class="field">
+            <label for="tenant-name">Your Name</label>
+            <input type="text" id="tenant-name" placeholder="Jane Smith" required />
+          </div>
+          <div class="field">
+            <label for="tenant-email">Email <span class="optional">(optional)</span></label>
+            <input type="email" id="tenant-email" placeholder="you@email.com" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Issue Details ──────────────────────────────────────────────────── -->
+      <p class="section-heading">Issue Details</p>
+      <div class="card">
+        <div class="field">
+          <label for="issue-title">Issue Title</label>
+          <input type="text" id="issue-title" placeholder="e.g. Leaking kitchen faucet" required />
+        </div>
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            placeholder="Describe the issue in detail — what happened, where it is, how long it's been a problem…"
+            required
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- ── Priority ───────────────────────────────────────────────────────── -->
+      <p class="section-heading">Priority Level</p>
+      <div class="card">
+        <div class="field">
+          <div class="priority-group">
+            <div class="priority-chip" data-value="Not Urgent" onclick="selectPriority(this)">
+              <span class="chip-icon">🟢</span>Not Urgent
+            </div>
+            <div class="priority-chip" data-value="Needs Attention" onclick="selectPriority(this)">
+              <span class="chip-icon">🟡</span>Needs Attention
+            </div>
+            <div class="priority-chip selected" data-value="Emergency" onclick="selectPriority(this)">
+              <span class="chip-icon">🔴</span>Emergency
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Photo ─────────────────────────────────────────────────────────── -->
+      <p class="section-heading">Photo <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94A3B8;">(optional)</span></p>
+      <div class="card">
+        <div class="field">
+          <label class="photo-upload-label" for="photo-input">
+            <!-- Camera icon -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="stroke:currentColor;">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="13" r="4" stroke-width="1.8"/>
+            </svg>
+            Tap to attach a photo
+          </label>
+          <input type="file" id="photo-input" accept="image/*" onchange="previewPhoto(this)" />
+          <img id="photo-preview" alt="Preview" />
+          <p class="photo-hint">JPG or PNG — helps your landlord assess the issue faster</p>
+        </div>
+      </div>
+
+      <!-- Bottom error banner -->
+      <div id="error-banner-bottom" class="error-banner"></div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">
+        <!-- Send icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+        Submit Request
+      </button>
+
+    </form>
+
+    <div class="footer">Secured &amp; powered by <strong>PropEasy</strong> — Property management for independent landlords</div>
+
+  </div><!-- /form-wrapper -->
+
+</div><!-- /page -->
+
+<script>
+  // ── Config ────────────────────────────────────────────────────────────────
+  const SUPABASE_URL  = 'https://wovhlttwgqepvgnaornh.supabase.co';
+  const SUPABASE_ANON = 'sb_publishable_FymtSrp2L8rUExseNOFRxg_nNYRxN3F';
+
+  // ── Read URL params ────────────────────────────────────────────────────────
+  const params = new URLSearchParams(window.location.search);
+  const TOKEN  = params.get('token');
+
+  // Populated after the token lookup RPC resolves.
+  let PROPERTY_ID = null;
+
+  // ── Priority selection ─────────────────────────────────────────────────────
+  let selectedPriority = 'Emergency';
+
+  function selectPriority(el) {
+    document.querySelectorAll('.priority-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPriority = el.dataset.value;
+  }
+
+  // ── Photo preview ──────────────────────────────────────────────────────────
+  function previewPhoto(input) {
+    const preview = document.getElementById('photo-preview');
+    if (input.files && input.files[0]) {
+      preview.src = URL.createObjectURL(input.files[0]);
+      preview.style.display = 'block';
+    }
+  }
+
+  // ── Invalid link screen ────────────────────────────────────────────────────
+  function showInvalidLink() {
+    document.getElementById('form-wrapper').innerHTML = `
+      <div class="invalid-wrap">
+        <div class="invalid-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+              stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="invalid-title">Invalid Link</div>
+        <div class="invalid-body">
+          This link is not valid or has expired.<br/>
+          Please ask your landlord for a new submission link.
+        </div>
+      </div>
+    `;
+    document.getElementById('property-chip').style.display = 'none';
+  }
+
+  // ── Load property info + existing tenant_message on page load ─────────────
+  async function loadPropertyInfo() {
+    if (!TOKEN) {
+      showInvalidLink();
+      return;
+    }
+
+    try {
+      const rpcRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/rpc/get_property_by_submission_token`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON,
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+          },
+          body: JSON.stringify({ p_token: TOKEN }),
+        }
+      );
+
+      if (!rpcRes.ok) { showInvalidLink(); return; }
+
+      const rows = await rpcRes.json();
+      if (!rows || rows.length === 0) { showInvalidLink(); return; }
+
+      PROPERTY_ID = rows[0].id;
+      const nickname = rows[0].nickname;
+
+      document.getElementById('property-name-chip').textContent = nickname;
+      document.getElementById('property-chip').classList.add('visible');
+
+      const msgRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/maintenance_requests?property_id=eq.${PROPERTY_ID}&order=submitted_at.desc&limit=1&select=tenant_message`,
+        {
+          headers: {
+            'apikey': SUPABASE_ANON,
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+          },
+        }
+      );
+
+      if (msgRes.ok) {
+        const msgRows = await msgRes.json();
+        if (msgRows.length > 0 && msgRows[0].tenant_message) {
+          document.getElementById('message-banner-text').textContent = msgRows[0].tenant_message;
+          document.getElementById('message-banner').classList.add('visible');
+        }
+      }
+    } catch {
+      showInvalidLink();
+    }
+  }
+
+  // ── Upload photo to Supabase Storage ──────────────────────────────────────
+  async function uploadPhoto(file) {
+    const ext      = file.name.split('.').pop();
+    const filename = `${PROPERTY_ID}/${Date.now()}.${ext}`;
+
+    const res = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/maintenance-photos/${filename}`,
+      {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON,
+          'Authorization': `Bearer ${SUPABASE_ANON}`,
+          'Content-Type': file.type,
+        },
+        body: file,
+      }
+    );
+
+    if (!res.ok) throw new Error('Photo upload failed.');
+    return `${SUPABASE_URL}/storage/v1/object/public/maintenance-photos/${filename}`;
+  }
+
+  // ── Submit ─────────────────────────────────────────────────────────────────
+  document.getElementById('maintenance-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const errorBanner = document.getElementById('error-banner-bottom');
+    errorBanner.classList.remove('visible');
+
+    if (!TOKEN) {
+      errorBanner.textContent = 'Invalid link — no submission token found. Please ask your landlord for a new link.';
+      errorBanner.classList.add('visible');
+      return;
+    }
+
+    const btn         = document.getElementById('submit-btn');
+    const tenantName  = document.getElementById('tenant-name').value.trim();
+    const tenantEmail = document.getElementById('tenant-email').value.trim();
+    const issueTitle  = document.getElementById('issue-title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const photoFile   = document.getElementById('photo-input').files[0] ?? null;
+
+    btn.disabled  = true;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;animation:spin 1s linear infinite"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" opacity=".3"/><path d="M12 2A10 10 0 0 1 22 12h-2a8 8 0 0 0-8-8z"/></svg> Submitting…';
+
+    try {
+      // Upload photo first if one was attached
+      let photoUrl = null;
+      if (photoFile) {
+        if (!PROPERTY_ID) throw new Error('Property not resolved yet — please wait a moment and try again.');
+        photoUrl = await uploadPhoto(photoFile);
+      }
+
+      // Use the SECURITY DEFINER RPC so the insert can run without a user
+      // session. The function looks up user_id from the property token
+      // server-side, bypassing the RLS policy that blocks anonymous inserts.
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_maintenance_request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'apikey':        SUPABASE_ANON,
+          'Authorization': `Bearer ${SUPABASE_ANON}`,
+        },
+        body: JSON.stringify({
+          p_token:        TOKEN,
+          p_tenant_name:  tenantName,
+          p_tenant_email: tenantEmail || null,
+          p_title:        issueTitle,
+          p_description:  description,
+          p_urgency:      selectedPriority,
+          p_photo_url:    photoUrl || null,
+        }),
+      });
+
+      if (!res.ok) {
+        // Supabase returns { message, hint, code, details } on errors
+        const errBody = await res.json().catch(() => ({}));
+        const msg = errBody.message || errBody.hint || errBody.details
+          || `Submission failed (HTTP ${res.status}). Please try again.`;
+        throw new Error(msg);
+      }
+
+      // Success — hide the form and show the confirmation screen
+      document.getElementById('form-wrapper').classList.add('hidden');
+      document.getElementById('success-screen').classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (err) {
+      console.error('[submit] error:', err);
+      errorBanner.textContent = err.message || 'Something went wrong. Please try again.';
+      errorBanner.classList.add('visible');
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> Submit Request';
+      // Scroll to error so user sees it on mobile
+      errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+
+  // ── Spinner keyframe ───────────────────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(style);
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  loadPropertyInfo();
+</script>
+</body>
+</html>
