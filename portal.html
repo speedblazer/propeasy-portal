@@ -159,6 +159,8 @@
         rpc('get_tenant_by_token', { p_token: TOKEN }),
         rpc('get_tenant_payments_by_token', { p_token: TOKEN }),
       ]);
+      console.log('tenant response:', JSON.stringify(tenant));
+      console.log('payments response:', JSON.stringify(payments));
 
       if (!tenant) {
         document.getElementById('loading').style.display = 'none';
