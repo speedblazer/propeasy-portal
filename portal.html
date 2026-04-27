@@ -134,7 +134,12 @@
       headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
-    return res.json();
+    const data = await res.json();
+    // RPC returns json type — may be string that needs parsing
+    if (typeof data === 'string') {
+      try { return JSON.parse(data); } catch { return data; }
+    }
+    return data;
   }
 
   async function load() {
