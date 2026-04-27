@@ -131,15 +131,20 @@
   async function rpc(fn, body) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
       method: 'POST',
-      headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
+      headers: { 
+        'apikey': SUPABASE_ANON, 
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+        'Content-Type': 'application/json' 
+      },
       body: JSON.stringify(body),
     });
-    const data = await res.json();
-    // RPC returns json type — may be string that needs parsing
-    if (typeof data === 'string') {
-      try { return JSON.parse(data); } catch { return data; }
-    }
-    return data;
+    const text = await res.text();
+    try {
+      const data = JSON.parse(text);
+      if (typeof data === 'string') return JSON.parse(data);
+      if (Array.isArray(data)) return data[0] ?? null;
+      return data;
+    } catch { return null; }
   }
 
   async function load() {
