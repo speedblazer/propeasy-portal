@@ -1,2 +1,3 @@
 /portal.html https://speedblazer.github.io/propeasy-portal/portal.html 301!
+/portal.html?* https://speedblazer.github.io/propeasy-portal/portal.html?:splat 301!
 /* https://speedblazer.github.io/propeasy-portal/:splat 301!
