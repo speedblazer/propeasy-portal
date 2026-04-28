@@ -142,7 +142,6 @@
     try {
       const data = JSON.parse(text);
       if (typeof data === 'string') return JSON.parse(data);
-      if (Array.isArray(data)) return data[0] ?? null;
       return data;
     } catch { return null; }
   }
